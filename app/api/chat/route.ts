@@ -30,26 +30,36 @@ export async function POST(request: Request) {
       }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('API Response not OK:', response.status, errorText);
-      throw new Error(`API request failed: ${response.status} ${errorText}`);
+    let errorText;
+    try {
+      errorText = await response.text();
+      // 尝试解析响应为 JSON
+      const data = JSON.parse(errorText);
+      
+      if (!response.ok) {
+        console.error('API Response not OK:', response.status, data);
+        throw new Error(data.error?.message || `API request failed: ${response.status}`);
+      }
+
+      if (!data.choices?.[0]?.message) {
+        console.error('Unexpected API response format:', data);
+        throw new Error('Invalid API response format');
+      }
+
+      return NextResponse.json(data.choices[0].message);
+    } catch (parseError) {
+      // 如果响应不是有效的 JSON
+      console.error('Failed to parse API response:', errorText);
+      throw new Error('API 返回了无效的响应格式');
     }
-
-    const data = await response.json();
-    console.log('API Response:', data);
-
-    if (!data.choices?.[0]?.message) {
-      console.error('Unexpected API response format:', data);
-      throw new Error('Invalid API response format');
-    }
-
-    return NextResponse.json(data.choices[0].message);
   } catch (error) {
     console.error('Detailed API Error:', error);
-    // 返回更具体的错误信息
+    // 返回用户友好的错误信息
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : '处理请求时发生错误' },
+      { 
+        error: '抱歉，AI 服务暂时不可用，请稍后再试。如果问题持续存在，请联系客服。',
+        details: error instanceof Error ? error.message : '未知错误'
+      },
       { status: 500 }
     );
   }

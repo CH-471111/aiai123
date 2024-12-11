@@ -1,7 +1,9 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { getChatResponse } from '../services/ai'
+import LoadingSpinner from '../components/LoadingSpinner'
+import dynamic from 'next/dynamic'
 
 interface Message {
   role: 'user' | 'assistant';
@@ -15,16 +17,16 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // 自动滚动到底部
-  const scrollToBottom = () => {
+  // 使用 useCallback 优化函数
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
+  }, [])
 
   useEffect(() => {
     scrollToBottom()
-  }, [messages])
+  }, [messages, scrollToBottom])
 
-  // 自动聚焦输入框（仅在桌面端）
+  // 防抖处理输入
   useEffect(() => {
     if (window.innerWidth > 768) {
       inputRef.current?.focus()
@@ -59,6 +61,24 @@ export default function ChatPage() {
     }
   }
 
+  // 消息渲染优化
+  const renderMessage = useCallback((message: Message, index: number) => (
+    <div
+      key={index}
+      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+    >
+      <div
+        className={`max-w-[85%] rounded-lg p-4 ${
+          message.role === 'user'
+            ? 'bg-[var(--primary)] text-white'
+            : 'bg-[var(--card-background)] text-[var(--foreground)]'
+        } shadow-sm`}
+      >
+        {message.content}
+      </div>
+    </div>
+  ), [])
+
   return (
     <div className="flex flex-col h-screen bg-[var(--background)]">
       <header className="bg-[var(--card-background)] shadow-sm p-4 fixed top-0 w-full z-10">
@@ -76,33 +96,14 @@ export default function ChatPage() {
             </ul>
           </div>
         ) : (
-          messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[85%] rounded-lg p-4 ${
-                  message.role === 'user'
-                    ? 'bg-[var(--primary)] text-white'
-                    : 'bg-[var(--card-background)] text-[var(--foreground)]'
-                } shadow-sm`}
-              >
-                {message.content}
-              </div>
-            </div>
-          ))
+          messages.map(renderMessage)
         )}
         <div ref={messagesEndRef} />
         
         {isLoading && (
           <div className="flex justify-start">
             <div className="bg-[var(--card-background)] rounded-lg p-4 shadow-sm">
-              <div className="flex space-x-2">
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-              </div>
+              <LoadingSpinner />
             </div>
           </div>
         )}
