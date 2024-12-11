@@ -51,7 +51,8 @@ export async function POST(request: Request) {
       const result = data.choices[0].message;
       console.log('Sending response to client:', result);
       return NextResponse.json(result);
-    } catch (parseError) {
+    } catch {
+      // 如果响应不是有效的 JSON
       console.error('Failed to parse API response:', responseText);
       throw new Error('API 返回了无效的响应格式');
     }
