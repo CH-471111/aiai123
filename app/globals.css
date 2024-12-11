@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground: #171717;
+  --background: #ffffff;
+  --card-background: #ffffff;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground: #e5e5e5;
+    --background: #171717;
+    --card-background: #262626;
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  transition: background-color 0.3s ease;
+}
+
+/* 移动端优化：禁用双击缩放 */
+@media (max-width: 768px) {
+  * {
+    touch-action: manipulation;
+  }
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
