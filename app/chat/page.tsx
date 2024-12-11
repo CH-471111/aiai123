@@ -49,10 +49,10 @@ export default function ChatPage() {
         } as Message])
       }
     } catch (error) {
-      console.error('发生错误:', error)
+      console.error('发生错误:', error);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: '抱歉，我遇到了一些问题，请稍后再试。'
+        content: error instanceof Error ? error.message : '抱歉，我遇到了一些问题，请稍后再试。'
       }])
     } finally {
       setIsLoading(false)

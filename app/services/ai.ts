@@ -9,10 +9,16 @@ export async function getChatResponse(messages: Array<{role: 'user' | 'assistant
     });
 
     if (!response.ok) {
-      throw new Error('API 请求失败');
+      const errorData = await response.json();
+      throw new Error(errorData.error || '请求失败');
     }
 
-    return await response.json();
+    const data = await response.json();
+    if (!data.content) {
+      throw new Error('API 响应格式错误');
+    }
+
+    return data;
   } catch (error) {
     console.error('AI API 调用错误:', error);
     throw error;
