@@ -29,6 +29,8 @@ export async function POST(request: Request) {
     );
   }
 
+  console.log('Using API key starting with:', apiKey.substring(0, 8));
+
   try {
     const body = await request.json();
     const { messages } = body;
