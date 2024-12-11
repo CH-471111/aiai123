@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { getChatResponse } from '../services/ai'
 import LoadingSpinner from '../components/LoadingSpinner'
-import dynamic from 'next/dynamic'
 
 interface Message {
   role: 'user' | 'assistant';
@@ -88,7 +87,7 @@ export default function ChatPage() {
       <div className="flex-1 overflow-y-auto p-4 space-y-4 mt-16 mb-20">
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 mt-8 space-y-4">
-            <p>您可以问我任何问题，比如：</p>
+            <p>您可以问我��何问题，比如：</p>
             <ul className="space-y-2">
               <li>• 今天应该穿什么衣服？</li>
               <li>• 如何制作红烧肉？</li>

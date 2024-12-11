@@ -30,11 +30,10 @@ export async function POST(request: Request) {
       }),
     });
 
-    let errorText;
+    let responseText;
     try {
-      errorText = await response.text();
-      // 尝试解析响应为 JSON
-      const data = JSON.parse(errorText);
+      responseText = await response.text();
+      const data = JSON.parse(responseText);
       
       if (!response.ok) {
         console.error('API Response not OK:', response.status, data);
@@ -47,14 +46,13 @@ export async function POST(request: Request) {
       }
 
       return NextResponse.json(data.choices[0].message);
-    } catch (parseError) {
+    } catch {
       // 如果响应不是有效的 JSON
-      console.error('Failed to parse API response:', errorText);
+      console.error('Failed to parse API response:', responseText);
       throw new Error('API 返回了无效的响应格式');
     }
   } catch (error) {
     console.error('Detailed API Error:', error);
-    // 返回用户友好的错误信息
     return NextResponse.json(
       { 
         error: '抱歉，AI 服务暂时不可用，请稍后再试。如果问题持续存在，请联系客服。',
