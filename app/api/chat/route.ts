@@ -2,8 +2,11 @@ import OpenAI from 'openai';
 import { NextResponse } from 'next/server';
 
 const client = new OpenAI({
-  apiKey: process.env.DEEPSEEK_API_KEY,
-  baseURL: 'https://api.deepseek.com/v1'
+  apiKey: process.env.DEEPSEEK_API_KEY || '',
+  baseURL: 'https://api.deepseek.com/v1',
+  dangerouslyAllowBrowser: true,
+  defaultQuery: { apiKey: process.env.DEEPSEEK_API_KEY },
+  defaultHeaders: { 'api-key': process.env.DEEPSEEK_API_KEY || '' }
 });
 
 export async function POST(request: Request) {
