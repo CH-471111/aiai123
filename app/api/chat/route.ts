@@ -7,6 +7,13 @@ const client = new OpenAI({
 });
 
 export async function POST(request: Request) {
+  if (!process.env.DEEPSEEK_API_KEY) {
+    return NextResponse.json(
+      { error: 'DeepSeek API key not configured' },
+      { status: 500 }
+    );
+  }
+
   try {
     const body = await request.json();
     const { messages } = body;
