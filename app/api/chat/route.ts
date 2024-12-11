@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { messages } = body;
 
-    console.log('Sending request to DeepSeek API...');
+    console.log('Sending request to DeepSeek API with messages:', messages);
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -30,10 +30,13 @@ export async function POST(request: Request) {
       }),
     });
 
-    let responseText;
+    console.log('DeepSeek API response status:', response.status);
+    const responseText = await response.text();
+    console.log('DeepSeek API raw response:', responseText);
+
     try {
-      responseText = await response.text();
       const data = JSON.parse(responseText);
+      console.log('Parsed response data:', data);
       
       if (!response.ok) {
         console.error('API Response not OK:', response.status, data);
@@ -45,9 +48,10 @@ export async function POST(request: Request) {
         throw new Error('Invalid API response format');
       }
 
-      return NextResponse.json(data.choices[0].message);
-    } catch {
-      // 如果响应不是有效的 JSON
+      const result = data.choices[0].message;
+      console.log('Sending response to client:', result);
+      return NextResponse.json(result);
+    } catch (parseError) {
       console.error('Failed to parse API response:', responseText);
       throw new Error('API 返回了无效的响应格式');
     }
