@@ -1,16 +1,21 @@
 import { NextResponse } from 'next/server';
 
-async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 2) {
+async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 2): Promise<Response> {
+  let lastError: Error | undefined;
+  
   for (let i = 0; i <= maxRetries; i++) {
     try {
       const response = await fetch(url, options);
       return response;
     } catch (error) {
-      if (i === maxRetries) throw error;
+      lastError = error instanceof Error ? error : new Error('Unknown error');
+      if (i === maxRetries) break;
       // 等待后重试
       await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, i)));
     }
   }
+  
+  throw lastError || new Error('Failed to fetch after retries');
 }
 
 export async function POST(request: Request) {
@@ -40,8 +45,6 @@ export async function POST(request: Request) {
         messages,
         temperature: 0.7,
         max_tokens: 2000,
-        // 添加超时设置
-        timeout: 30000,
       }),
     });
 
